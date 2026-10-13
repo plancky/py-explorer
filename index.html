@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python Pipeline Explorer</title>
+  <script type="module" crossorigin src="./assets/index-Cu7MipM4.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CGl_YodH.css">
+</head>
+<body>
+<header>
+  <h1>Python Pipeline Explorer</h1>
+  <span class="pipeline">source → tokenize → ast → compile/dis</span>
+  <span class="spacer"></span>
+  <label class="chk">Example
+    <select id="examples"><option value="">—</option></select>
+  </label>
+  <span id="status" class="loading">Loading CPython (Pyodide)…</span>
+</header>
+<div id="msgbar"></div>
+<main id="main">
+  <section class="pane">
+    <div class="pane-head"><span class="title">Source</span>
+      <span class="tools"><span class="count">hover any item on the right to see its source range</span></span></div>
+    <div id="editor"></div>
+  </section>
+  <div class="gutter" data-g="1"></div>
+  <section class="pane" id="paneA"></section>
+  <div class="gutter" data-g="2"></div>
+  <section class="pane" id="paneB"></section>
+</main>
+</body>
+</html>
