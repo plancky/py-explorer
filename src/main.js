@@ -19,10 +19,17 @@ cm.on("cursorActivity", () => syncFromCursor(true));
 // ---------- examples ----------
 const exSel = document.getElementById("examples");
 for (const name of Object.keys(EXAMPLES)) exSel.append(h("option", { value: name }, name));
+// Show the example the editor currently holds; "—" once it's been edited.
+const syncExample = () => {
+  const src = cm.getValue();
+  exSel.value = Object.keys(EXAMPLES).find(k => EXAMPLES[k] === src) ?? "";
+};
 exSel.addEventListener("change", () => {
   if (!exSel.value) return;
-  cm.setValue(EXAMPLES[exSel.value]); cm.focus(); exSel.value = "";
+  cm.setValue(EXAMPLES[exSel.value]); cm.focus();
 });
+cm.on("changes", syncExample);
+syncExample();
 
 initResize(document.getElementById("main"));
 
