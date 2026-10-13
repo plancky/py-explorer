@@ -24,25 +24,27 @@ It started as a companion to [*Crafting Interpreters*](https://craftinginterpret
 
 ## Running it
 
-It's a static site with no build step and no dependencies to install. It must be served over HTTP, because opening `index.html` as a `file://` URL won't load.
+It's a [Vite](https://vite.dev/) app. You need Node.js and [pnpm](https://pnpm.io/).
 
 ```bash
-git clone https://github.com/<you>/py-explorer.git
+git clone https://github.com/plancky/py-explorer.git
 cd py-explorer
-python3 -m http.server 8000
-# open http://localhost:8000
+pnpm install
+pnpm dev        # dev server with hot reload, http://localhost:5173
+pnpm build      # static production build in dist/
+pnpm preview    # serve dist/ locally
 ```
 
 The first load downloads about 10 MB of CPython-on-WebAssembly from the jsDelivr CDN and takes a few seconds. After that the browser caches it.
 
 ### Deploying to GitHub Pages
 
-Everything is static, so Pages works as-is: **Settings → Pages → Deploy from a branch → `main` / root**.
+`pnpm build` writes a static site with relative asset paths to `dist/`, so it works from a project subpath. On every push to `main`, `.github/workflows/pages.yml` builds the site and publishes `dist/` to the root of the `gh-pages` branch, which Pages serves (**Settings → Pages → Deploy from a branch → `gh-pages` / root**).
 
 ## How it works
 
 ```
-index.html                          analyze.py (runs inside Pyodide)
+src/ (UI)                           src/analyze.py (runs inside Pyodide)
 ┌─────────────────────────┐  src   ┌───────────────────────────────────┐
 │ CodeMirror editor       │ ─────▶ │ tokenize.generate_tokens(...)     │
 │   (300 ms debounce)     │        │ ast.parse(...)  → JSON tree       │
@@ -54,17 +56,25 @@ index.html                          analyze.py (runs inside Pyodide)
 - [**Pyodide**](https://pyodide.org/) is CPython compiled to WebAssembly, so the analysis uses the standard library's own `tokenize`, `ast` and `dis` rather than a reimplementation.
 - `analyze.py` does all the work in one call and returns JSON. Every item carries a source range `[start_line, start_col, end_line, end_col]`.
 - **One subtlety:** `ast` and `dis` report column offsets in *UTF-8 bytes*, while `tokenize` and the editor count *characters*. `analyze.py` converts them, so highlighting stays correct on lines containing `é`, `→` or emoji.
-- `index.html` contains the UI in plain JavaScript, with [CodeMirror 5](https://codemirror.net/5/) for the editor.
+- The UI is plain JavaScript modules, bundled by Vite, with [CodeMirror 5](https://codemirror.net/5/) for the editor. `analyze.py` is inlined into the bundle as a string and run by Pyodide at startup.
 
 | File | Role |
 |---|---|
-| `index.html` | Layout, styles, editor, pane rendering, linked highlighting |
-| `analyze.py` | `analyze(src) -> JSON` with tokens, AST, bytecode and errors |
+| `index.html` | Page markup; loads `src/main.js` |
+| `src/main.js` | Entry point: styles, examples menu, panes, boot |
+| `src/editor.js` | CodeMirror setup and source-range highlighting |
+| `src/panes.js` | Pane switching, item hover/click, cursor → pane linking |
+| `src/views/` | Renderers for the Tokens, AST and Bytecode views |
+| `src/analysis.js` | Loads Pyodide, runs `analyze()` on edits, shows errors |
+| `src/resize.js` | Draggable column gutters |
+| `src/examples.js` | Built-in example snippets |
+| `src/styles/` | Theme tokens, layout, editor theme and per-view CSS |
+| `src/analyze.py` | `analyze(src) -> JSON` with tokens, AST, bytecode and errors |
 
 `analyze.py` also runs on its own, which is handy for checking its output:
 
 ```bash
-python3 analyze.py "x = 1 + 2"
+python3 src/analyze.py "x = 1 + 2"
 ```
 
 ## Things to try
@@ -79,7 +89,7 @@ python3 analyze.py "x = 1 + 2"
 
 - Output reflects the CPython version bundled with the pinned Pyodide release (currently **CPython 3.13.2, Pyodide 0.29.0**). Bytecode in particular changes between Python versions. The exact version is shown in the header.
 - Analysis runs on the main thread, which is fine for normal snippets. Pasting thousands of lines will feel sluggish.
-- Needs network access on first load for the CDN-hosted Pyodide and CodeMirror.
+- Needs network access on first load for the CDN-hosted Pyodide runtime. CodeMirror is bundled.
 
 ## License
 

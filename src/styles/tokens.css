@@ -1,0 +1,16 @@
+/* tokens */
+td.text { white-space: pre; }
+td.pos { color: var(--muted); }
+.tag { font-weight: 600; }
+.tag small { font-weight: 400; color: var(--muted); }
+.cat-name .tag { color: var(--c-name); }
+.cat-kw .tag { color: var(--c-kw); }
+.cat-soft .tag { color: var(--c-soft); }
+.cat-op .tag { color: var(--c-op); }
+.cat-num .tag { color: var(--c-num); }
+.cat-str .tag { color: var(--c-str); }
+.cat-struct .tag { color: var(--c-struct); font-style: italic; }
+.cat-comment .tag { color: var(--c-comment); }
+.cat-err .tag { color: var(--err); }
+.hide-trivia tr.cat-trivia { display: none; }
+.tok-err { padding: 8px 10px; color: var(--err); }

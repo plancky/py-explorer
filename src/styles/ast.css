@@ -1,0 +1,18 @@
+/* AST */
+.ast { padding: 6px 4px 12px; }
+.ast details { margin-left: 14px; }
+.ast > details { margin-left: 0; }
+.ast summary { list-style: none; padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+.ast summary::-webkit-details-marker { display: none; }
+.ast summary::before { content: "▸"; display: inline-block; width: 12px; color: var(--muted); transition: transform .1s; }
+.ast details[open] > summary::before { transform: rotate(90deg); }
+.ast summary[data-i]:hover { background: var(--hl-line); }
+.ast .kids { border-left: 1px dashed var(--border); margin-left: 11px; }
+.ast .field { margin-left: 14px; padding: 1px 6px 1px 18px; white-space: nowrap; }
+.ast .lbl { color: var(--muted); }
+.ast .t { color: var(--c-call); font-weight: 650; }
+.ast .leaf { color: var(--c-op); }
+.ast .pos { color: var(--muted); font-size: 11px; margin-left: 6px; }
+.ast .k-str { color: var(--c-str); } .ast .k-num { color: var(--c-num); } .ast .k-const { color: var(--c-kw); }
+.hide-pos .ast .pos { display: none; }
+.hide-ctx .ast .f-ctx { display: none; }
